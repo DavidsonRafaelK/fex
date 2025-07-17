@@ -68,5 +68,15 @@ typedef struct
 } window_event_t;
 
 fe_error_t window_init(window_context_t *ctx, const window_config_t *config);
+fe_error_t window_poll_event(window_context_t *ctx, window_event_t *event);
+fe_error_t window_resize(window_context_t *ctx, int width, int height);
+
+void window_destroy(window_context_t *ctx);
+void window_swap_buffers(window_context_t *ctx);
+
+bool window_should_close(const window_context_t *ctx);
+bool window_is_focused(const window_context_t *ctx);
+
+window_config_t window_get_config(void);
 
 #endif
