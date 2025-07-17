@@ -1,0 +1,23 @@
+#ifndef @PROJECT_NAME @_CONFIG_H
+#define @PROJECT_NAME @_CONFIG_H
+
+// Project information
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define PROJECT_VERSION "@PROJECT_VERSION@"
+#define PROJECT_DESCRIPTION "@PROJECT_DESCRIPTION@"
+
+// Build configuration
+#define BUILD_TYPE "@CMAKE_BUILD_TYPE@"
+
+// Feature flags
+#cmakedefine HAVE_LIBMAGIC
+
+// System information
+#define BUILD_SYSTEM "@CMAKE_SYSTEM@"
+#define BUILD_PROCESSOR "@CMAKE_SYSTEM_PROCESSOR@"
+#define C_COMPILER "@CMAKE_C_COMPILER_ID@"
+
+// Installation paths
+#define INSTALL_PREFIX "@CMAKE_INSTALL_PREFIX@"
+
+#endif // @PROJECT_NAME@_CONFIG_H
