@@ -1,9 +1,10 @@
-#ifdef WINDOW_H
+#ifndef WINDOW_H
 #define WINDOW_H
 
+#include "common.h"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysyms.h>
+#include <X11/keysym.h>
 #include <stdbool.h>
 
 typedef struct
