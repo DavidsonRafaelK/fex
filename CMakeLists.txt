@@ -1,63 +1,49 @@
 cmake_minimum_required(VERSION 3.16)
 project(fex C)
 
-set(PROJET_VERSION "0.1.0")
-set(PROJET_DESCRIPTION "FEX is a fast and efficient file explorer for Linux. Build from scratch with a focus on performance and simplicity.")
+set(PROJECT_VERSION "0.1.0")
+set(PROJECT_DESCRIPTION "FEX is a fast and efficient file explorer for Linux. Built from scratch with a focus on performance and simplicity.")
 
 set(CMAKE_C_STANDARD 11)
-SET(cmake_C_STANDARD_REQUIRED ON)
-SET(CMAKE_C_EXTENSIONS OFF)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
-if (NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    set(CMAKE_C_FLAGS "-g -00 -DDEBUG -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer")
+# Compiler flags
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    set(CMAKE_C_FLAGS "-g -O0 -DDEBUG -fsanitize=address,undefined -fno-omit-frame-pointer")
     set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -flto")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "-O2 -g -DNDEBUG")
     set(CMAKE_C_FLAGS_MINSIZEREL "-Os -DNDEBUG")
 endif()
 
+# Dependencies
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(X11 REQUIRED x11)
+pkg_check_modules(CAIRO REQUIRED cairo)
+pkg_check_modules(PANGO REQUIRED pango)
+pkg_check_modules(PANGOCAIRO REQUIRED pangocairo)
+pkg_check_modules(FONTCONFIG REQUIRED fontconfig)
+
+# Includes
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
-    ${X11_INCLUDE_DIR}
+    ${X11_INCLUDE_DIRS}
     ${CAIRO_INCLUDE_DIRS}
     ${PANGO_INCLUDE_DIRS}
+    ${PANGOCAIRO_INCLUDE_DIRS}
     ${FONTCONFIG_INCLUDE_DIRS}
 )
 
-set(COMMON_SOURCES
-    src/common.c
-)
-
-set(WINDOW_SOURCES
-    src/window.c
-)
-
-set(FILE_SOURCES
-    src/file_ops.c
-)
-
-set(RENDER_SOURCES
-    src/render.c
-)
-
-set(INPUT_SOURCES
-    src/input.c
-)
-
-set(MAIN_SOURCES
-    src/main.c
-)
-
+# Sources
 set(ALL_SOURCES
-    ${COMMON_SOURCES}
-    ${WINDOW_SOURCES}
-    ${FILE_SOURCES}
-    ${RENDER_SOURCES}
-    ${INPUT_SOURCES}
-    ${MAIN_SOURCES}
+    src/common.c
+    src/window.c
+    src/main.c
+    # Add more if needed
 )
 
 add_executable(${PROJECT_NAME} ${ALL_SOURCES})
@@ -89,35 +75,36 @@ target_link_libraries(${PROJECT_NAME}
     ${PANGO_LIBRARIES}
     ${PANGOCAIRO_LIBRARIES}
     ${FONTCONFIG_LIBRARIES}
-    ${EXTRA_LIBS}
-    m  # Math library
+    m
 )
 
 configure_file(
     "${CMAKE_SOURCE_DIR}/config.h.in"
     "${CMAKE_BINARY_DIR}/config.h"
 )
-
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_BINARY_DIR}")
 
+# Package Info
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_DESCRIPTION})
 set(CPACK_PACKAGE_VENDOR "DavidsonRafaelK")
 set(CPACK_PACKAGE_CONTACT "davidsonrafael20@gmail.com")
 
+# Options
 option(ENABLE_TESTS "Enable testing" OFF)
 option(ENABLE_STATIC_ANALYSIS "Enable static analysis" OFF)
 option(ENABLE_DOCUMENTATION "Enable documentation generation" OFF)
 
+# Testing
 if(ENABLE_TESTS)
     enable_testing()
-    # Add test subdirectory if it exists
     if(EXISTS "${CMAKE_SOURCE_DIR}/tests")
         add_subdirectory(tests)
     endif()
 endif()
 
+# Static Analysis
 if(ENABLE_STATIC_ANALYSIS)
     find_program(CLANG_TIDY clang-tidy)
     if(CLANG_TIDY)
@@ -127,6 +114,7 @@ if(ENABLE_STATIC_ANALYSIS)
     endif()
 endif()
 
+# Documentation
 if(ENABLE_DOCUMENTATION)
     find_package(Doxygen)
     if(DOXYGEN_FOUND)
@@ -139,11 +127,7 @@ if(ENABLE_DOCUMENTATION)
     endif()
 endif()
 
+# Debug output
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C compiler: ${CMAKE_C_COMPILER}")
 message(STATUS "C flags: ${CMAKE_C_FLAGS}")
-if(HAVE_LIBMAGIC)
-    message(STATUS "libmagic: Found")
-else()
-    message(STATUS "libmagic: Not found (file type detection will be limited)")
-endif()
