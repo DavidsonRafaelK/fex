@@ -1,40 +1,36 @@
 #include "../include/window.h"
 #include "../include/common.h"
+#include "../include/config.h"
 
-#include <unistd.h>
+window_config_t config = {
+    .width = WINDOW_DEFAULT_WIDTH,
+    .height = WINDOW_DEFAULT_HEIGHT,
+    .x = WINDOW_POSITION_X,
+    .y = WINDOW_POSITION_Y,
+    .title = WINDOW_TITLE,
+    .resizable = WINDOW_RESIZABLE,
+};
 
 int main(void)
 {
-    log_message(LOG_LEVEL_DEBUG, __FILE__, __LINE__, "Debugging information");
+    window_context_t ctx;
 
-    window_config_t config = window_get_config();
-    window_context_t ctx = {0};
-
-    fe_error_t err = window_init(&ctx, &config);
-    if (err != FE_SUCCESS)
+    if (window_init(&ctx, &config) != FE_SUCCESS)
     {
-        LOG_ERROR("Failed to initialize window: %s", fe_strerror(err));
+        LOG_ERROR("Failed to initialize window");
         return EXIT_FAILURE;
     }
 
-    // Main loop
+    // Main Loop
     while (!window_should_close(&ctx))
     {
         window_event_t event;
-        while (window_poll_event(&ctx, &event) == FE_SUCCESS && event.type != WINDOW_EVENT_NONE)
+        if (window_poll_event(&ctx, &event) == FE_SUCCESS)
         {
             switch (event.type)
             {
             case WINDOW_EVENT_CLOSE:
-                LOG_INFO("Close event received");
                 ctx.should_close = true;
-                break;
-            case WINDOW_EVENT_KEY_PRESS:
-                if (event.data.key.key == XK_Escape)
-                {
-                    LOG_INFO("Escape key pressed, closing window");
-                    ctx.should_close = true;
-                }
                 break;
             case WINDOW_EVENT_RESIZE:
                 LOG_INFO("Window resized to: %dx%d", event.data.resize.width, event.data.resize.height);
@@ -43,11 +39,10 @@ int main(void)
                 break;
             }
         }
-
-        usleep(FRAME_TIME * 1000);
+        window_swap_buffers(&ctx);
     }
 
-    // Cleanup
     window_destroy(&ctx);
+    LOG_INFO("Window closed successfully");
     return EXIT_SUCCESS;
 }
