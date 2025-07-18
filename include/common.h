@@ -8,18 +8,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+#include <time.h>
 
-#define APP_NAME "FEX"
-#define APP_VERSION "0.1.0"
-#define APP_AUTHOR "DavidsonRafaelK"
-#define APP_PATH_LENGTH 4096
-#define WINDOW_DEFAULT_WIDTH 800
-#define WINDOW_DEFAULT_HEIGHT 600
-#define WINDOW_MIN_WIDTH 400
-#define WINDOW_MIN_HEIGHT 300
-
-#define FPS_TARGET 60                  // Make the target FPS constant
-#define FRAME_TIME (1000 / FPS_TARGET) // Frame time in milliseconds
+#include "config.h"
 
 typedef enum
 {
